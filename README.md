@@ -1,34 +1,36 @@
 # NIGHT SHIFT: WARD 09
 
-A Phaser 3 / Vite surveillance-horror game. JavaScript only.
+A 2D surveillance-horror anomaly detection game built with Phaser 3 and Vite.
 
+## Overview
+
+NIGHT SHIFT: WARD 09 is a psychological horror game centered on observation, memory, and fast decision-making. Set in a secretive facility, you play as a night guard monitoring four security cameras. Your objective is to detect and report environmental anomalies before containment fails.
+
+## Gameplay Loop
+
+1. Observe: Watch camera feeds for shifted items, missing objects, or surreal occurrences.
+2. Report: Submit reports when changes are spotted to reset the room to its default state.
+3. Manage Threats: Failing to notice anomalies escalates the threat stage, causing entities to advance toward your location.
+
+## Story & Lore
+
+- You take a high-paying night security job requiring no prior experience.
+- Initial incidents appear to be technical glitches, but objects soon move on their own and entities appear on the feed.
+- The facility investigates "Residual", a dangerous phenomenon that duplicates physical environments, memories, and items. You are part of the experiment.
+
+## Map Layout
+
+| Room ID | Room Name | Description |
+| --- | --- | --- |
+| Room 01 | Office | Basic office environment serving as the tutorial zone. |
+| Room 02 | Storage | Dark warehouse area with frequent object shifts and disappearances. |
+| Room 03 | Observation Room | Research laboratory where dangerous entities first manifest. |
+| Room 04 | Restricted Area | Classified sector containing core facility secrets. |
+
+## Setup & Development
+
+### Installation
 
 ```bash
 npm install
 npm run dev
-```
-
-## Controls
-
-- **F** — flashlight on/off
-- **Mouse** — aim the flashlight over the active monitor
-- Camera buttons — switch camera feed
-- **Report Anomaly** — report a dangerous change
-- **Confirm Normal** — dismiss a harmless change
-- **SPACE** — timing input while the recharge minigame is active
-- **ESC** — pause
-
-## Main systems
-
-- A dangerous anomaly appears roughly every 3.6–4.4 seconds, when a camera slot is free.
-- Feeds are fully obscured unless the flashlight is on. The anomaly and entity art are drawn underneath that darkness layer, so they are never visible without the light.
-- The handheld flashlight cell drains at 2.35 percentage points per second while illuminated, both at the desk and during patrol. It does not drain while switched off. Camera switching, false reports, and sealing the office door do not consume cell charge.
-- The recharge test uses three timing hits. Three hits restore 28%, two restore 17%, one restores 7%; zero hits fail.
-- The Patient advances exactly one stage for every false report, incorrect normal confirmation, missed dangerous anomaly, or bad intercom response. Time alone never advances it.
-- Later stages use the same creature image at progressively closer camera positions and larger scales. Stage four triggers the office-door sequence.
-- The lights-flicker anomaly switches between the lit and unlit emergency-light sprites. Object anomalies use the supplied pack's doors, placards, pipes, spills, warning decals, and equipment props.
-
-## Audio
-
-See [`AUDIO_SOURCES.md`](./AUDIO_SOURCES.md) for creator credits, licenses, source pages, and the optional local crying WAV setup. Recorded sound effects are used instead of procedural WebAudio voice/noise effects. Remote OpenGameArt audio streams need an internet connection. The crier's local `crying.wav` file must be added separately as described there.
-
