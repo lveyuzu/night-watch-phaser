@@ -2,17 +2,10 @@
 
 A Phaser 3 / Vite surveillance-horror game. JavaScript only.
 
-## Run on Fedora / Linux
 
 ```bash
 npm install
 npm run dev
-```
-
-Open the localhost URL printed by Vite. To create a production build:
-
-```bash
-npm run build
 ```
 
 ## Controls
@@ -39,8 +32,3 @@ npm run build
 
 See [`AUDIO_SOURCES.md`](./AUDIO_SOURCES.md) for creator credits, licenses, source pages, and the optional local crying WAV setup. Recorded sound effects are used instead of procedural WebAudio voice/noise effects. Remote OpenGameArt audio streams need an internet connection. The crier's local `crying.wav` file must be added separately as described there.
 
-## Project notes
-
-- The uploaded facility art and four camera photos were preserved.
-- The old hand-drawn rectangular anomaly overlays were replaced with layered object sprites where the supplied pack has a matching prop.
-- The browser game has been syntax-checked. Run `npm run build` locally after `npm install` to validate the installed dependency versions in your environment.
