@@ -1,17 +1,4 @@
-// =====================================================================================
-// OfficeScene.js  -  the main gameplay scene (security office + camera monitor).
-//
-// What happens here:
-//   * A full-screen CCTV feed is shown. It is pitch black unless the flashlight (F) is on.
-//   * New anomalies (objects that appear in a room) spawn about every 10 seconds.
-//   * The player flips between 4 cameras and presses REPORT or CONFIRM NORMAL.
-//   * Every mistake pulls THE PATIENT (the entity) one stage closer to the office.
-//   * At stage 4 the entity is at the door: a short final test decides life or death.
-//
-// This file only DRAWS and CONNECTS things. The rules live in the systems/ folder:
-//   GameClock (time), PowerManager (battery), AnomalyManager (what spawns), EntityAI (stages).
-// Press H while playing to print the placement values of the current anomaly and entity.
-// =====================================================================================
+ 
 import Phaser from 'phaser';
 import GameClock from '../systems/GameClock.js';
 import PowerManager from '../systems/PowerManager.js';
@@ -59,7 +46,7 @@ const OBJECTS = {
   flicker: { key: 'asset-emergency-on', x: 0.79, y: 0.18, scale: 0.62, angle: 0 },   // swaps on/off texture in render()
   box:     { key: 'asset-electrical-box', x: 0.70, y: 0.77, scale: 0.29, angle: -4 },
   biohazard: { key: 'asset-biohazard', x: 0.37, y: 0.67, scale: 0.34, angle: -3 },
-  figure:  { key: 'creature', x: 0.51, y: 0.60, scale: 0.145, angle: 0, tint: 0x626b69 },
+  figure:  { key: 'dark', x: 0.51, y: 0.60, scale: 0.145, angle: 0, tint: 0x626b69 },
   door:    { key: 'asset-door-open', x: 0.80, y: 0.61, scale: 0.50, angle: 0 },
   brokenDoor: { key: 'asset-door-broken', x: 0.79, y: 0.62, scale: 0.43, angle: 0 },
   pipe:    { key: 'asset-pipe', x: 0.22, y: 0.69, scale: 0.82, angle: 4 },
@@ -73,7 +60,7 @@ const OBJECTS = {
   paper:   { key: 'asset-sign', x: 0.42, y: 0.81, scale: 0.27, angle: 18 },
   refl:    { key: 'creature', x: 0.57, y: 0.54, scale: 0.20, angle: 6, tint: 0x7b8581 },
   crier:   { key: 'creature', x: 0.75, y: 0.77, scale: 0.19, angle: 12, tint: 0x939995 },
-  twin:    { key: 'creature', x: 0.34, y: 0.66, scale: 0.17, angle: -4, flipX: true, tint: 0x717a77 },
+  twin:    { key: 'knockingcamera', x: 0.34, y: 0.66, scale: 0.17, angle: -4, flipX: true, tint: 0x717a77 },
   moth:    { key: 'asset-debris', x: 0.65, y: 0.23, scale: 0.25, angle: -8 }
 };
 
@@ -81,16 +68,14 @@ const OBJECTS = {
 // (0-based). Stage 4 is inside the office, so there is no entry: no camera shows it.
 // Further stages are bigger, brighter and closer to the original image colours.
 const ENTITY_STAGES = [
-  { cam: 0, x: 0.65, y: 0.68, scale: 0.060, alpha: 0.48, tint: 0x59615f, angle: -4 },   // Ward 09: small and faint
-  { cam: 1, x: 0.54, y: 0.66, scale: 0.115, alpha: 0.72, tint: 0x78817d, angle: 2 },    // East Corridor
-  { cam: 2, x: 0.70, y: 0.70, scale: 0.205, alpha: 0.88, tint: 0xb0aaa0, angle: 8 },   // Nurses Hall: large, with a red ghost copy
-  { cam: 3, x: 0.53, y: 0.78, scale: 0.305, alpha: 1, tint: 0xffffff, angle: -6 }      // Washroom: full size, solid
+  { cam: 0, x: 0.57, y: 0.46, scale: 0.20, alpha: 0.48, tint: 0x59615f, angle: 0 },
+  { cam: 1, x: 0.45, y: 0.66, scale: 0.28, alpha: 0.72, tint: 0x78817d, angle: 0 },
+  { cam: 2, x: 0.50, y: 0.75, scale: 0.28, alpha: 0.88, tint: 0xb0aaa0, angle: 0 },
+  { cam: 3, x: 0.53, y: 0.78, scale: 0.42, alpha: 1, tint: 0xffffff, angle: 0 }
 ];
 
-const BAR = 320, ZONE = 56;   // recharge minigame: width of the bar and of the green hit zone (pixels)
+const BAR = 320, ZONE = 56;   // recharge minigame
 
-// Seconds until the NEXT anomaly spawns: about 10s, slowly getting a bit faster each hour
-// (never below 8s), plus 0-2s of randomness. Change this line to tune the pacing.
 const spawnGap = (hour) => Math.max(8, 11 - hour * 0.6) + Math.random() * 2;
 
 // Button colours per kind: [outline colour, fill colour].
@@ -99,11 +84,10 @@ const KIND = { plain: [0x6b8079, 0x23302d], accent: [0x7fc4a8, 0x2c5a4a], danger
 export default class Office extends Phaser.Scene {
   constructor() { super('Office'); }
 
-  // ===================================================================================
-  // UI HELPERS (kept inside this file so the scene does not depend on ui.js)
-  // ===================================================================================
 
-  // Make a HUD text object with a soft shadow so it stays readable over the camera image.
+  // UI HELPERS 
+
+
   txt(x, y, s, size = 12, color = '#cfdcd6', bold = false) {
     return this.add.text(x, y, s, { fontFamily: FONT, fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal' })
       .setShadow(1, 1, '#000000', 3, false, true).setDepth(12);
@@ -271,7 +255,7 @@ export default class Office extends Phaser.Scene {
       ov.push(this.txt(318, 185 + i * 44, v, 11, '#cfdcd6').setWordWrapWidth(430).setDepth(22));
     });
     const go = this.txt(480, 418, 'CLICK TO BEGIN YOUR SHIFT', 12, '#e6f0eb', true).setOrigin(0.5).setDepth(22); ov.push(go);
-    this.tweens.add({ targets: go, alpha: 0.25, duration: 800, yoyo: true, repeat: -1 });   // pulsing prompt
+    // this.tweens.add({ targets: go, alpha: 0.25, duration: 800, yoyo: true, repeat: -1 });   // pulsing prompt
     ov[0].on('pointerdown', () => { ov.forEach((o) => o.destroy()); this.intro = false; this.paused = false; this.say('Shift started. Camera network online.'); });
 
     // --- KEYBOARD ---
@@ -291,11 +275,9 @@ export default class Office extends Phaser.Scene {
     this.say(HINTS[0]);
   }
 
-  // ===================================================================================
   // GAMEPLAY LOGIC
-  // ===================================================================================
 
-  // Pause or resume. Pausing stops update() from advancing the clock, timers and spawns.
+
   pause(v) { this.paused = v; this.pauseT.setVisible(v); this.cover.setVisible(v); this.resB.show(v); this.menB.show(v); if (v) audio.stop('ambience'); else audio.loop('ambience', 0.12); }
 
   // Add a message to the on-screen log (keeps the newest 6).
