@@ -1,5 +1,3 @@
-// Camera image viewport. Real props and the creature sprite are layered by OfficeScene;
-// this module only provides the monitor bounds and subtle analogue scan lines.
 export const X = 20;
 export const Y = 54;
 export const W = 610;
