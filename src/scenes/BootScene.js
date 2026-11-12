@@ -45,7 +45,7 @@ export default class Boot extends Phaser.Scene {
   }
 
   create() {
-    // Tiny patrol sprites are intentionally simple and remain secondary to the environment art.
+    
     const graphics = this.make.graphics({ add: false });
     const pixel = (color, x, y, w, h) => graphics.fillStyle(color, 1).fillRect(x, y, w, h);
     pixel(0x30403c, 2, 0, 8, 3); pixel(0x20302c, 1, 3, 10, 1);
