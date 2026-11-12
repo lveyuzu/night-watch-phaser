@@ -8,13 +8,11 @@ const FONT = '"Lucida Console","Courier New",monospace';
 export default class Over extends Phaser.Scene {
   constructor() { super('Over'); }
 
-  // Same shadowed text helper as the other scenes.
   txt(x, y, s, size, color, bold = false, spacing = 0) {
     return this.add.text(x, y, s, { fontFamily: FONT, fontSize: size + 'px', color, fontStyle: bold ? 'bold' : 'normal', letterSpacing: spacing })
       .setShadow(2, 2, '#000000', 4, false, true);
   }
 
-  // Vignette / scanline / left-shade overlays. Same textures MenuScene makes; created here too in case this scene runs first.
   ensureTextures() {
     if (this.textures.exists('menu-vig')) return;
     const mk = (key, fn) => { const c = this.textures.createCanvas(key, W, H); fn(c.getContext()); c.refresh(); };
@@ -23,24 +21,21 @@ export default class Over extends Phaser.Scene {
     mk('menu-scan', (x) => { x.fillStyle = 'rgba(0,0,0,0.18)'; for (let i = 0; i < H; i += 3) x.fillRect(0, i, W, 1); });
   }
 
-  // Typewriter effect: reveal `full` in obj at `cps` characters per second, then call done().
   type(obj, full, cps, done) {
-    if (!full) { if (done) done(); return; }                       // nothing to type (also avoids an endless timer)
+    if (!full) { if (done) done(); return; }                      
     let i = 0;
     this.time.addEvent({ delay: 1000 / cps, repeat: full.length - 1, callback: () => {
       i += 1; obj.setText(full.slice(0, i)); if (i >= full.length && done) done();
     } });
   }
 
-  // Fade to black, then change scene.
   go(key) {
     if (this.leaving) return; this.leaving = true;
     this.cameras.main.fadeOut(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start(key));
   }
 
-  // Vertical text menu (same look as the title screen). Hidden until showMenu() is called.
-  // list = [[label, callback], ...]
+  
   makeMenu(x, y, list) {
     this.menuOn = false; this.msel = 0;
     this.mItems = list.map(([label, fn], i) => {
@@ -65,13 +60,11 @@ export default class Over extends Phaser.Scene {
       this.tweens.add({ targets: it.text, x: it.x + (on ? 12 : 0), duration: 110 });
     });
   }
-  showMenu() {                                                     // fade the menu in and make it clickable
+  showMenu() {                                                    
     this.menuOn = true;
     this.mItems.forEach((it) => { it.zone.input.enabled = true; this.tweens.add({ targets: it.text, alpha: 1, duration: 600 }); });
     this.pickItem(0);
   }
-
-  // Draw the shared overlay stack (vignette, scanlines, grain layer).
   overlays(withShade) {
     if (withShade) this.add.image(0, 0, 'menu-shade').setOrigin(0).setDepth(3);
     this.add.image(0, 0, 'menu-vig').setOrigin(0).setDepth(4);
@@ -84,11 +77,9 @@ export default class Over extends Phaser.Scene {
     if (data.win) this.winScreen(); else this.deathScreen(data);
   }
 
-  // ===================================================================================
-  // WIN: slow dawn, lines appear one at a time, the last one is the reveal.
-  // ===================================================================================
+
   winScreen() {
-    this.cameras.main.fadeIn(2500, 0, 0, 0);                       // slow fade up, like light coming in
+    this.cameras.main.fadeIn(2500, 0, 0, 0);                       
     const bg = this.add.image(470, 270, 'cam2').setDisplaySize(1040, 585).setTint(0xa9bdb8).setDepth(0);
     this.tweens.add({ targets: bg, x: 495, duration: 20000, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
     const dim = this.add.rectangle(0, 0, W, H, 0x000000, 0.3).setOrigin(0).setDepth(2);
@@ -99,7 +90,6 @@ export default class Over extends Phaser.Scene {
     this.txt(300, 142, 'AM', 22, '#9fb6ad', true).setDepth(10);
     this.txt(74, 196, 'SHIFT COMPLETE', 14, '#7fc4a8', true, 3).setDepth(10);
 
-    // The ending, one line at a time. The last line is red and makes the lights stutter.
     const lines = [
       ['The replacement arrives early.', '#cfdcd6'],
       ['His badge reads your name.', '#cfdcd6'],
@@ -117,23 +107,17 @@ export default class Over extends Phaser.Scene {
     this.time.delayedCall(2800 + lines.length * 1600 + 600, () => this.showMenu());
   }
 
-  // ===================================================================================
-  // DEATH: jumpscare -> one beat of black silence -> typed incident report that is then covered up.
-  // ===================================================================================
   deathScreen(data) {
     this.add.rectangle(0, 0, W, H, 0x050707).setOrigin(0).setDepth(0);
     const key = this.textures.exists('jumpscare') ? 'jumpscare' : 'creature';
-    // Stretched to fill the whole 960x540 screen (the aspect ratio is NOT kept, on purpose),
-    // then it grows a little past the edges over 1.5s so it feels like it lunges at the camera.
     const scare = this.add.image(480, 270, key).setDepth(20).setDisplaySize(W, H);
     this.tweens.add({ targets: scare, displayWidth: W * 1.2, displayHeight: H * 1.2, duration: 1500, ease: 'Cubic.easeIn' });
 
-    audio.scare();                                                  // your existing scare sound...
-    this.jumpscareSound();                                          // ...layered with the extra jumpscare sound below
+    audio.scare();                                                
+    this.jumpscareSound();                                       
     this.cameras.main.shake(1300, 0.03);
     this.cameras.main.flash(160, 255, 235, 235);
 
-    // Glitch: every 50ms either jitter + colour flash, or sit still; sometimes drop to black for one frame.
     const glitch = this.time.addEvent({ delay: 50, loop: true, callback: () => {
       if (!scare.active) return;
       if (Math.random() > 0.4) { scare.setX(480 + (Math.random() * 30 - 15)); scare.setTint(Math.random() > 0.5 ? 0xff3333 : 0x33ffff); }
@@ -160,7 +144,7 @@ export default class Over extends Phaser.Scene {
     this.txt(60, 180, 'STATUS             UNRESOLVED', 11, '#7f918a').setDepth(10);
     this.makeMenu(60, 400, [['NEW SHIFT', () => this.go('Office')], ['MAIN MENU', () => this.go('Menu')]]);
 
-    // The paper: slightly rotated, aged colour, dark typed text.
+    
     const px = 360, py = 70, pw = 540, ph = 400;
     const paper = this.add.container(px, py).setDepth(10).setAngle(-1.2);
     const sheet = this.add.graphics();
@@ -178,7 +162,7 @@ export default class Over extends Phaser.Scene {
     cause.setText(causeFull); const ch = cause.height, cw = cause.width; cause.setText('');
     const amend = this.add.text(28, 26 + hh + ch + 40, '', ink);
     const amendFull = 'OFFICIAL RECORD (AMENDED):\nGuard resigned voluntarily. No incident occurred.\nWard 09 has been empty since 1994.';
-    const bar = this.add.rectangle(24, 26 + hh + 6 - 3, cw + 10, ch + 6, 0x14110e).setOrigin(0).setScale(0, 1);   // black redaction bar, grows over the cause
+    const bar = this.add.rectangle(24, 26 + hh + 6 - 3, cw + 10, ch + 6, 0x14110e).setOrigin(0).setScale(0, 1);   
     paper.add([head, cause, bar, amend]);
 
  
@@ -193,7 +177,7 @@ export default class Over extends Phaser.Scene {
             this.time.delayedCall(500, () => this.type(amend, amendFull, 55, () => {
               this.time.delayedCall(700, () => {
                 this.tweens.add({ targets: stamp, alpha: 0.92, scale: 1, duration: 160, ease: 'Quint.in', onComplete: () => {
-                  audio.knock(); this.cameras.main.shake(180, 0.006);       // the stamp lands
+                  audio.knock(); this.cameras.main.shake(180, 0.006);       
                   this.time.delayedCall(900, () => this.showMenu());
                 } });
               });
@@ -206,7 +190,7 @@ export default class Over extends Phaser.Scene {
 
   
   jumpscareSound() {
-    if (audio.mute) return;                                         // respect the mute setting
+    if (audio.mute) return;                                       
     const c = audio.ctx || (this.ownCtx = this.ownCtx || new (window.AudioContext || window.webkitAudioContext)());
     if (c.state === 'suspended') c.resume();
     const dest = audio.ctx && audio.master ? audio.master : c.destination;
