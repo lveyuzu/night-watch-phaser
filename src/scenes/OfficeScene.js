@@ -22,7 +22,7 @@ const HINTS = [
   '05 AM  One more hour. Do not leave the monitors unattended.'
 ];
 
-// Rows of the briefing card shown before the shift: [key, explanation].
+
 const BRIEF = [
   ['F', 'Flashlight. Aim it with the mouse. The feeds are black without it.'],
   ['REPORT', 'Something dangerous changed in this room.'],
@@ -82,19 +82,18 @@ export default class Office extends Phaser.Scene {
 
   chip(x, y, w, h, label, fn, kind = 'plain') {
     const [edge, fill] = KIND[kind];
-    const g = this.add.graphics().setDepth(10);                    // draws the button body
-    const t = this.add.text(x + w / 2, y + h / 2, label,           // the label, centred
+    const g = this.add.graphics().setDepth(10);                    
+    const t = this.add.text(x + w / 2, y + h / 2, label,         
       { fontFamily: FONT, fontSize: '12px', color: '#e6f0eb', fontStyle: 'bold' }).setOrigin(0.5).setDepth(11);
-    const z = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(10);   // invisible click area
+    const z = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).setDepth(10);   
     const o = { vis: true, hover: false, dimmed: false, t, r: z };
 
-    // Redraw the button body for its current state (hover / dimmed / hidden).
     o.draw = () => {
       g.clear(); if (!o.vis) return;
-      g.fillStyle(0x040808, 0.78).fillRoundedRect(x, y, w, h, 4);                              // dark backing
-      g.fillStyle(fill, o.hover ? 0.9 : 0.55).fillRoundedRect(x, y, w, h, 4);                  // coloured fill (brighter on hover)
-      g.fillStyle(edge, o.dimmed ? 0.25 : 0.9).fillRect(x, y + 4, 2, h - 8);                   // accent tick on the left edge
-      g.lineStyle(1, o.hover ? 0xe6f0eb : edge, o.dimmed ? 0.25 : 0.55).strokeRoundedRect(x, y, w, h, 4);   // outline
+      g.fillStyle(0x040808, 0.78).fillRoundedRect(x, y, w, h, 4);                              
+      g.fillStyle(fill, o.hover ? 0.9 : 0.55).fillRoundedRect(x, y, w, h, 4);                  
+      g.fillStyle(edge, o.dimmed ? 0.25 : 0.9).fillRect(x, y + 4, 2, h - 8);                  
+      g.lineStyle(1, o.hover ? 0xe6f0eb : edge, o.dimmed ? 0.25 : 0.55).strokeRoundedRect(x, y, w, h, 4);   
     };
     z.on('pointerover', () => { o.hover = true; o.draw(); });
     z.on('pointerout', () => { o.hover = false; o.draw(); });
@@ -176,7 +175,6 @@ export default class Office extends Phaser.Scene {
     this.redFlash = this.add.rectangle(0, 0, W, H, 0x8d1717, 1).setOrigin(0).setDepth(9).setAlpha(0);  
     this.hudG = this.add.graphics().setDepth(12);                                  
 
-    // --- HUD TEXT ---
     this.hud = this.txt(26, 14, '12:00 AM', 30, '#e8f0ec', true);                
     this.txt(28, 50, 'NIGHT SHIFT  /  WARD 09', 10, '#7f968e');
     this.rec = this.txt(480, 16, '', 13, '#e8f0ec', true).setOrigin(0.5, 0);       
