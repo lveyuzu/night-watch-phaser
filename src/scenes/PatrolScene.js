@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {T} from '../ui.js';
 import audio from '../systems/AudioManager.js';
-// WASD move, E interact, F flashlight. Reset the breaker at the far end, then run back to the office door.
+
 export default class Patrol extends Phaser.Scene{
   constructor(){super('Patrol')}
   create(){
