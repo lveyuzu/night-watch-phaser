@@ -1,4 +1,4 @@
-# NIGHT SHIFT: WARD 09
+# NIGHT SHIFT: WARD 09 (UNFINISHED!!!)
 
 A 2D surveillance-horror anomaly detection game built with Phaser 3 and Vite.
 
@@ -28,6 +28,7 @@ NIGHT SHIFT: WARD 09 is a psychological horror game centered on observation, mem
 | Room 04 | Restricted Area | Classified sector containing core facility secrets. |
 
 ## Setup & Development
+Keep in mind that there are issues with assets and still in development!
 
 ### Installation
 
