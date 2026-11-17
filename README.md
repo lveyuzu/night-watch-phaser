@@ -30,10 +30,10 @@ NIGHT SHIFT: WARD 09 is a psychological horror game centered on observation, mem
 
 Keep in mind that there are issues with assets and still in development!
 
-### Vercel link
-https://night-watch-phaser-deployment.vercel.app
+# Vercel link
+### https://night-watch-phaser-deployment.vercel.app
 
-### Installation
+# Installation
 
 ```bash
 npm install
